@@ -4,6 +4,13 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Container(
+      child: Column(
+        children: [
+          Text('abc',style: TextStyle(color: Colors.blueAccent),)
+
+        ],
+      ),
+    );
   }
 }
