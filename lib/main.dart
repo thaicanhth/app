@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'LandingScreen/landing_screen.dart';
+
+import 'pages/home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: "Poppins",
       ),
-      home: LandingScreen(),
+      home: HomePage(),
     );
   }
 }
