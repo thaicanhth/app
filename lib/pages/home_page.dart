@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 
 import '../util/smart_device_box.dart';
+import 'drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,9 +20,12 @@ class _HomePageState extends State<HomePage> {
   List mySmartDevices = [
     // [ smartDeviceName, iconPath , powerStatus ]
     ["Smart Light", "lib/icons/light-bulb.png", true],
-    ["Smart AC", "lib/icons/air-conditioner.png", false],
-    ["Smart TV", "lib/icons/smart-tv.png", false],
-    ["Smart Fan", "lib/icons/fan.png", false],
+    ["Smart AC", "lib/icons/air-conditioner.png", true],
+    ["Smart TV", "lib/icons/smart-tv.png", true],
+    ["Smart Fan", "lib/icons/fan.png", true],
+    ["Smart Door Lock", "lib/icons/light-bulb.png", true],
+    ["Smart Door ", "lib/icons/smart-tv.png", true],
+    ["Smart Light 1", "lib/icons/light-bulb.png", true],
   ];
 
   // power button switched
@@ -36,6 +39,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
+      appBar: AppBar(
+        backgroundColor: Colors.grey[300],
+        elevation: 0,
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.notifications_none,
+              ))
+        ],
+      ),
+      drawer: MyDrawer(),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,27 +61,25 @@ class _HomePageState extends State<HomePage> {
                 horizontal: horizontalPadding,
                 vertical: verticalPadding,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // menu icon
-                  Image.asset(
-                    'lib/icons/menu.png',
-                    height: 45,
-                    color: Colors.grey[800],
-                  ),
-
-                  // account icon
-                  Icon(
-                    Icons.person,
-                    size: 45,
-                    color: Colors.grey[800],
-                  )
-                ],
-              ),
+              // child: Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     // menu icon
+              //     Image.asset(
+              //       'lib/icons/menu.png',
+              //       height: 45,
+              //       color: Colors.grey[800],
+              //     ),
+              //
+              //     // account icon
+              //     Icon(
+              //       Icons.person,
+              //       size: 45,
+              //       color: Colors.grey[800],
+              //     )
+              //   ],
+              // ),
             ),
-
-            const SizedBox(height: 20),
 
             // welcome home
             Padding(
@@ -75,18 +88,94 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Welcome Home,",
-                    style: TextStyle(fontSize: 20, color: Colors.grey.shade800),
+                    "Hello Canh,",
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.grey.shade800,
+                        fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'Mitch Koko',
-                    style: GoogleFonts.bebasNeue(fontSize: 72),
+                    'Welcome To Home',
+                    // style: GoogleFonts.bebasNeue(fontSize: 25),
+                    style: TextStyle(fontSize: 25, color: Colors.grey.shade900),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 15),
 
-            const SizedBox(height: 25),
+            Row(
+              children: [
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(children: [
+                            Image.asset('lib/icons/temperature.png',width: 40,
+                            height: 40,
+                            ),
+                          ],),
+                          Text(
+                            "40°c",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                          Text(
+                            "Temperature",
+                            style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding:
+                        EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Image.asset('lib/icons/humidity.png',width: 40,
+                                height: 40,
+                              ),
+                            ],),
+                            Text(
+                              "59%",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            Text(
+                              "Humidity",
+                              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
 
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 40.0),
@@ -96,7 +185,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(height: 10),
 
             // smart devices grid
             Padding(
@@ -110,14 +199,13 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
 
             // grid
             Expanded(
               child: GridView.builder(
-                itemCount: 4,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 25),
+                itemCount: mySmartDevices.length,
+                // physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 1 / 1.3,

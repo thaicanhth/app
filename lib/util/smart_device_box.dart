@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SmartDeviceBox extends StatelessWidget {
   final String smartDeviceName;
@@ -49,7 +48,7 @@ class SmartDeviceBox extends StatelessWidget {
                         smartDeviceName,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 16,
                           color: powerOn ? Colors.white : Colors.black,
                         ),
                       ),
@@ -60,10 +59,12 @@ class SmartDeviceBox extends StatelessWidget {
                     child: CupertinoSwitch(
                       value: powerOn,
                       onChanged: onChanged,
+                      activeColor: Colors.lightBlueAccent,
                     ),
                   ),
                 ],
-              )
+              ),
+
             ],
           ),
         ),
