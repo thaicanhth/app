@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-
 import '../util/smart_device_box.dart';
 import 'drawer.dart';
 
@@ -10,7 +8,6 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
   // padding constants
   final double horizontalPadding = 40;
@@ -61,24 +58,6 @@ class _HomePageState extends State<HomePage> {
                 horizontal: horizontalPadding,
                 vertical: verticalPadding,
               ),
-              // child: Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     // menu icon
-              //     Image.asset(
-              //       'lib/icons/menu.png',
-              //       height: 45,
-              //       color: Colors.grey[800],
-              //     ),
-              //
-              //     // account icon
-              //     Icon(
-              //       Icons.person,
-              //       size: 45,
-              //       color: Colors.grey[800],
-              //     )
-              //   ],
-              // ),
             ),
 
             // welcome home
@@ -103,41 +82,40 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 15),
-
             Row(
               children: [
                 Expanded(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: horizontalPadding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(children: [
-                            Image.asset('lib/icons/temperature.png',width: 40,
-                            height: 40,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding:
+                        EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Image.asset('lib/icons/temperature.png',width: 40,
+                                height: 40,
+                              ),
+                            ],),
+                            Text(
+                              "40°c",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
+                              ),
                             ),
-                          ],),
-                          Text(
-                            "40°c",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                          Text(
-                            "Temperature",
-                            style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                            Text(
+                              "Temperature",
+                              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 Expanded(
                   child: Column(
