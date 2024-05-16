@@ -1,4 +1,5 @@
-import 'package:app/pages/home_page.dart';
+
+import 'package:app/pages/next_home.dart';
 import 'package:flutter/material.dart';
 
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: "Poppins",
       ),
-     home: HomePage(),
+     home: Next_home(),
     );
   }
 }
