@@ -1,5 +1,11 @@
+<<<<<<<<< Temporary merge branch 1
+import 'package:app/pages/home_page.dart';
+=========
+
 import 'package:app/pages/next_home.dart';
+>>>>>>>>> Temporary merge branch 2
 import 'package:flutter/material.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +23,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: "Poppins",
       ),
-      home: Next_home(),
+<<<<<<<<< Temporary merge branch 1
+     home: HomePage(),
+=========
+     home: Next_home(),
+>>>>>>>>> Temporary merge branch 2
     );
   }
 }
