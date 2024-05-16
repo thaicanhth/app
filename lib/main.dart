@@ -1,4 +1,3 @@
-import 'package:app/pages/home_page.dart';
 import 'package:app/pages/next_home.dart';
 import 'package:flutter/material.dart';
 

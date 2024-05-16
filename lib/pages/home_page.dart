@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../util/smart_device_box.dart';
 import 'drawer.dart';
 
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
 class _HomePageState extends State<HomePage> {
   // padding constants
   final double horizontalPadding = 40;
@@ -40,14 +42,34 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.grey[300],
         elevation: 0,
         actions: [
-          IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.notifications_none,
-              ))
+          Stack(
+            children: [
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.notifications_none,
+                    size: 30,
+                  )),
+              Positioned(
+                top: 0,
+                right: 6,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.red[500],
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text(
+                    '1',
+                    style: TextStyle(fontSize: 10),
+                  ),
+                ),
+              )
+            ],
+          )
         ],
       ),
-      drawer: MyDrawer(),
+      drawer:const MyDrawer(),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,25 +81,48 @@ class _HomePageState extends State<HomePage> {
                 vertical: verticalPadding,
               ),
             ),
-
-            // welcome home
             Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Hello Canh,",
-                    style: TextStyle(
-                        fontSize: 25,
-                        color: Colors.grey.shade800,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'Welcome To Home',
-                    // style: GoogleFonts.bebasNeue(fontSize: 25),
-                    style: TextStyle(fontSize: 25, color: Colors.grey.shade900),
-                  ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        child: SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: ClipRRect(
+                            borderRadius: BorderRadiusDirectional.circular(20),
+                            child: Image.asset(
+                              'lib/icons/man.jpg',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                     const SizedBox(
+                        width: 5,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hello Canh,",
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.grey.shade800,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Welcome To Home',
+                            // style: GoogleFonts.bebasNeue(fontSize: 25),
+                            style: TextStyle(
+                                fontSize: 20, color: Colors.grey.shade900),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
@@ -90,15 +135,19 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Padding(
                         padding:
-                        EdgeInsets.symmetric(horizontal: horizontalPadding),
+                            EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(children: [
-                              Image.asset('lib/icons/temperature.png',width: 40,
-                                height: 40,
-                              ),
-                            ],),
+                            Row(
+                              children: [
+                                Image.asset(
+                                  'lib/icons/temperature.png',
+                                  width: 40,
+                                  height: 40,
+                                ),
+                              ],
+                            ),
                             Text(
                               "40°c",
                               style: TextStyle(
@@ -109,7 +158,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Text(
                               "Temperature",
-                              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey[800]),
                             )
                           ],
                         ),
@@ -123,15 +173,19 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Padding(
                         padding:
-                        EdgeInsets.symmetric(horizontal: horizontalPadding),
+                            EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(children: [
-                              Image.asset('lib/icons/humidity.png',width: 40,
-                                height: 40,
-                              ),
-                            ],),
+                            Row(
+                              children: [
+                                Image.asset(
+                                  'lib/icons/humidity.png',
+                                  width: 40,
+                                  height: 40,
+                                ),
+                              ],
+                            ),
                             Text(
                               "59%",
                               style: TextStyle(
@@ -142,7 +196,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Text(
                               "Humidity",
-                              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey[800]),
                             )
                           ],
                         ),
