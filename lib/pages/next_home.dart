@@ -1,5 +1,4 @@
 import 'package:app/pages/home_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Next_home extends StatefulWidget {
@@ -23,8 +22,8 @@ class _Next_homeState extends State<Next_home> {
               'lib/icons/login.png',
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
+          const Padding(
+            padding: EdgeInsets.all(24.0),
             child: Text(
               'Sweet & Smart Home',
               textAlign: TextAlign.center,
@@ -34,31 +33,31 @@ class _Next_homeState extends State<Next_home> {
                   fontWeight: FontWeight.bold),
             ),
           ),
-          Text(
+          const Text(
             'Smart Home can change ',
             style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
           ),
-          Text(
+          const Text(
             'way you live in the future ',
             style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
           ),
-          SizedBox(
+          const SizedBox(
             height: 40,
           ),
           GestureDetector(
             onTap: () => Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) {
-              return HomePage();
+              return const HomePage();
             })),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
-              padding: EdgeInsets.all(24),
-              child: Text(
+              padding: const EdgeInsets.all(24),
+              child: const Text(
                 'Get Started',
               ),
             ),

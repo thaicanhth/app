@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: "Poppins",
       ),
-     home: Next_home(),
+     home: const Next_home(),
     );
   }
 }
