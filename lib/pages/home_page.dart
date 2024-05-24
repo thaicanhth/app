@@ -1,7 +1,11 @@
+import 'package:app/models/location_menu.dart';
+import 'package:app/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_services.dart';
 import '../util/smart_device_box.dart';
 import 'drawer.dart';
-
+import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,6 +15,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<String> menuItems = [
+    "All phòng",
+    "Phòng khách",
+    "Phòng ngủ",
+    "Phòng tắm",
+    "Phòng bếp",
+  ];
+  int selectedIndex = 0;
+
+  void signOutUser(BuildContext context) {
+    AuthService().signOut(context);
+  }
+
   // padding constants
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
@@ -34,22 +51,40 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void goToProfilePage() {
+    Navigator.pop(context);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ProfilePage(),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         backgroundColor: Colors.grey[300],
         elevation: 0,
         actions: [
+          ElevatedButton(
+            onPressed: () => signOutUser(context),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.grey[300]),
+            ),
+            child: const Icon(Icons.logout_outlined,color: Colors.black,),
+          ),
           Stack(
             children: [
               IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.notifications_none,
-                    size: 30,
-                  )),
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.notifications_none,
+                  size: 30,
+                ),
+              ),
               Positioned(
                 top: 0,
                 right: 6,
@@ -64,12 +99,14 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(fontSize: 10),
                   ),
                 ),
-              )
+              ),
             ],
           )
         ],
       ),
-      drawer:const MyDrawer(),
+      drawer: MyDrawer(
+        onProfileTap: goToProfilePage,
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,14 +137,14 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                     const SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Hello Canh,",
+                            "Hello ${user.name}",
                             style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.grey.shade800,
@@ -126,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
             Row(
               children: [
                 Expanded(
@@ -135,7 +172,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Padding(
                         padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -173,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Padding(
                         padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -208,7 +245,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 5),
 
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 40.0),
@@ -218,13 +255,29 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            const SizedBox(height: 10),
-
-            // smart devices grid
+            const SizedBox(height: 5),
+            const SizedBox(
+              height: 5,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: LocationMenu(
+                menuItems: menuItems,
+                selectedIndex: selectedIndex,
+                onItemTapped: (index) {
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                },
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
               child: Text(
-                "Smart Devices",
+                "7 Active Devices",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -232,8 +285,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-
-            // grid
             Expanded(
               child: GridView.builder(
                 itemCount: mySmartDevices.length,
