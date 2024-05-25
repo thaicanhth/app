@@ -2,6 +2,8 @@ import 'package:app/pages/home_page.dart';
 import 'package:app/pages/next_home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'models/add_device_page.dart';
+import 'models/device_model.dart';
 import 'providers/user_provider.dart';
 import 'services/auth_services.dart';
 
@@ -41,6 +43,11 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),
       home: Provider.of<UserProvider>(context).user.token.isEmpty ?  const Next_home() :  const HomePage(),
+      routes: {
+        '/addDevice': (context) => AddDevicePage(
+          device: ModalRoute.of(context)?.settings.arguments as Device?,
+        ),
+      },
     );
   }
 }

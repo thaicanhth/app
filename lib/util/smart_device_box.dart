@@ -14,10 +14,11 @@ class SmartDeviceBox extends StatelessWidget {
     required this.smartDeviceName,
     required this.iconPath,
     required this.powerOn,
-    required this.onChanged,
+    required this.onChanged, required void Function() onEdit, required Future<void> Function() onDelete,
   });
 
   @override
+
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(15.0),

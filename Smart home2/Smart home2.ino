@@ -1,8 +1,8 @@
 #define DHTPIN 12      // Pin connected to the DHT sensor
 #define DHTTYPE DHT11  // DHT 11 or DHT22
 #define MCP23017_ADDR 0x26
-#define flameThreshold 200
-#define gasThreshold 850
+#define flameThreshold 500
+#define gasThreshold 700
 
 #include <Wire.h>
 #include <DHT.h>
@@ -14,6 +14,8 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 char keys[4][4] = {
         { '1', '2', '3', 'A' },
@@ -24,8 +26,13 @@ char keys[4][4] = {
 
 Adafruit_MCP23X17 mcp;
 
-String correctPassword = "1234";
-String inputPassword;
+String inputPassword = "";
+const String primaryPassword = "1234";  // Define the primary password
+bool newStatus = false;                 // Declare status variable
+bool doorStatus = false;
+bool updateDoorStatus();
+bool updateDoorStatuskeypad();
+
 unsigned long lastKeyTime = 0;
 char lastKey = '\0';
 int trangThaiCambien = 0;  // Khởi tạo giá trị ban đầu
@@ -72,8 +79,7 @@ qHyGO0aoSCqI3Haadr8faqU9GY/rOPNk3sgrDQoo//fb4hVC1CLQJ13hef4Y53CI
 rU7m2Ys6xt0nUW7/vGT1M0NPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNV
 HRMBAf8EBTADAQH/MB0GA1UdDgQWBBR5tFnme7bl5AFzgAiIyBpY9umbbjANBgkq
 hkiG9w0BAQsFAAOCAgEAVR9YqbyyqFDQDLHYGmkgJykIrGF1XIpu+ILlaS/V9lZL
-ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ
-3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
+ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ/-strong/-heart:>:o:-((:-h3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
 NFtY2PwByVS5uCbMiogziUwthDyC3+6WVwW6LLv3xLfHTjuCvjHIInNzktHCgKQ5
 ORAzI4JMPJ+GslWYHb4phowim57iaztXOoJwTdwJx4nLCgdNbOhdjsnvzqvHu7Ur
 TkXWStAmzOVyyghqpZXjFaH3pO3JLF+l+/+sKAIuvtd7u+Nxe5AW0wdeRlN8NwdC
@@ -92,6 +98,7 @@ unsigned long lastLowTime = 0;
 const unsigned long waitTime = 30 * 60 * 1000;  // 30 minutes in milliseconds
 char ssid[] = "Hideonbush";
 char pass[] = "111111110";
+const char *serverName = "http://172.20.10.5:3000/security";
 
 Servo myServo1;
 Servo myServo2;
@@ -165,8 +172,7 @@ void connectToMQTT() {
     while (!client.connected() && attempt < 3) {
         if (client.connect(mqtt_client_id, mqtt_username, mqtt_password)) {
             Serial.println("Connected to MQTT");
-        } else {
-            Serial.print("Failed, rc=");
+        } else {/-strong/-heart:>:o:-((:-hSerial.print("Failed, rc=");
             Serial.print(client.state());
             Serial.println(" try again in 5 seconds");
             delay(5000);
@@ -184,7 +190,7 @@ void checkLdr() {
     Serial.print("ldr Value: ");  // In giá trị đọc được ra Serial Monitor
 
     // Ngưỡng ánh sáng: bạn có thể điều chỉnh giá trị này
-    if (ldrValue > 500) {  // Kiểm tra nếu giá trị nhỏ hơn 500
+    if (ldrValue > 500) {          // Kiểm tra nếu giá trị nhỏ hơn 500
         digitalWrite(ledPin, HIGH);  // Bật đèn LED nếu ánh sáng yếu
     } else {
         digitalWrite(ledPin, LOW);  // Tắt đèn LED nếu ánh sáng đủ
@@ -202,36 +208,30 @@ void checkCamBien() {
         digitalWrite(pinDen, LOW);  // Tắt đèn
         Serial.println("Không phát hiện chuyển động");
     }
-    delay(200);
 }
 
 void checkSensors() {
     int flameValue = analogRead(sensorPin);
     int gasValue = analogRead(gasPin);
-    Serial.print("Flame Sensor Value: ");
+    Serial.print("Flame: ");
     Serial.println(flameValue);
-    Serial.print("Gas Value: ");
+    Serial.print("Gas: ");
     Serial.println(gasValue);
-
     bool flameDetected = flameValue > flameThreshold;
     bool gasDetected = gasValue > gasThreshold;
-
     if (flameDetected || gasDetected) {
         digitalWrite(BUZZER_PIN, HIGH);  // Bật buzzer
         lcd.clear();
         if (flameDetected) {
             lcd.print("Flame Detected!");
-            Serial.println("Buzzer ON - Flame detected");
         }
         if (gasDetected) {
             lcd.setCursor(0, 1);
             lcd.print("Gas Detected!");
-            Serial.println("Buzzer ON - Gas detected");
         }
     } else {
         digitalWrite(BUZZER_PIN, LOW);  // Tắt buzzer
         showSmartHome();
-        Serial.println("Buzzer OFF - No flame or gas detected");
     }
 }
 
@@ -256,14 +256,12 @@ void checkRain() {
     int rainStatus = digitalRead(rainSensor);
     if (rainStatus == LOW) {  // LOW nghĩa là có mưa
         // Hiển thị trên LCD
-        lcd.setCursor(0, 1);
+        lcd.setCursor(0, 0);
         lcd.print("Dang mua");
-        Serial.print("đang mưa");
         digitalWrite(BUZZER_PIN, HIGH);  // Bật buzzer
     } else {
         showSmartHome();
         digitalWrite(BUZZER_PIN, LOW);  // Tắt buzzer
-        Serial.print("ko mưa");
     }
 }
 
@@ -277,88 +275,142 @@ void checkFan() {
     }
 }
 
+void checkKeypad() {
+    checkDoorStatus();
+    char key = readKeypad();
+    if (key) {
+        if (key == '*') {
+            inputPassword = "";
+            Serial.println("Password cleared");
+        } else if (key == '#') {/-strong/-heart:>:o:-((:-hSerial.print("Password entered: ");
+            Serial.println(inputPassword);
+            // Compare with primary password
+            if (inputPassword == primaryPassword) {
+                Serial.println("Password is correct! Opening servo...");
+                // Open the door
+                myServo1.write(70);
+                myServo2.write(70);
+                Serial.println("Door is OPEN");
+                // Update door status on server to true
+                bool statusUpdated = updateDoorStatuskeypad(true);
+                if (statusUpdated) {
+                    // Đợi trong 70 giây
+                    unsigned long startTime = millis();
+                    while (millis() - startTime < 70000) {
+                        delay(100); // Tránh vòng lặp bị block
+                    }
 
+                    // Kiểm tra và cập nhật lại trạng thái cửa
+                    checkDoorStatus();
+                } else {
+                    Serial.println("Failed to update door status on server");
+                }
+            } else {
+                Serial.println("Password is incorrect!");
+                inputPassword = "";
+                // Close the door
+                myServo1.write(0);
+                myServo2.write(180);
+                Serial.println("Door is CLOSED");
+
+                // Update door status on server to false
+                bool statusUpdated = updateDoorStatuskeypad(false);
+                if (statusUpdated) {
+                    checkDoorStatus();  // Check and update door status
+                } else {
+                    Serial.println("Failed to update door status on server");
+                }
+            }
+        } else {
+            inputPassword += key;
+            lcd.setCursor(0, 1);
+            lcd.print(inputPassword);
+        }
+    }
+}
+
+void checkrfid() {
+    checkDoorStatusrfid();
+    if (mfrc522.PICC_IsNewCardPresent()) {
+        if (mfrc522.PICC_ReadCardSerial()) {
+            String rfidData = "";
+            for (byte i = 0; i < mfrc522.uid.size; i++) {
+                rfidData += String(mfrc522.uid.uidByte[i], HEX);
+            }
+            Serial.print("RFID Data: ");
+            Serial.println(rfidData);
+
+            if (WiFi.status() == WL_CONNECTED) {
+                HTTPClient http;
+                http.begin("http://172.20.10.5:3000/security/664e2067299448f755ddac86");
+                int httpResponseCode = http.GET();
+
+                if (httpResponseCode > 0) {
+                    String payload = http.getString();
+                    Serial.println(httpResponseCode);
+                    Serial.println(payload);
+
+                    StaticJsonDocument<256> doc;
+                    DeserializationError error = deserializeJson(doc, payload);
+
+                    if (error) {
+                        Serial.print("deserializeJson() failed: ");
+                        Serial.println(error.c_str());
+                    } else {
+                        const char *primaryPassword = doc["primaryPassword"];  // Get the primaryPassword from JSON
+                        if (rfidData == primaryPassword) {
+                            Serial.println("RFID password is correct! Opening servo...");
+                            // Open the door
+                            myServo3.write(90);
+                            Serial.println("Door is OPEN");
+
+                            // Update door status on server to true
+                            bool statusUpdated = updateDoorStatus(true);
+                            if (statusUpdated) {/-strong/-heart:>:o:-((:-hcheckDoorStatusrfid();  // Check and update door status
+                            } else {
+                                Serial.println("Failed to update door status on server");
+                            }
+                        } else {
+                            // Close the door
+                            myServo3.write(0);
+                            Serial.println("Door is CLOSED");
+
+                            // Update door status on server to false
+                            bool statusUpdated = updateDoorStatus(false);
+                            if (statusUpdated) {
+                                checkDoorStatusrfid();  // Check and update door status
+                            } else {
+                                Serial.println("Failed to update door status on server");
+                            }
+                        }
+                    }
+                } else {
+                    Serial.println("Error on HTTP request");
+                }
+                http.end();
+            }
+            mfrc522.PICC_HaltA();
+        } else {
+            Serial.println("Failed to read RFID card");
+        }
+    }
+}
 void loop() {
+    checkKeypad();
+    mfrc522.PCD_Init();  // Khởi tạo module RFID trong mỗi vòng lặp
+    checkrfid();
     checkLdr();
     checkCamBien();
+    checkSensors();
+    checkRain();
+    checkFan();
+    checkrfid();
+    mfrc522.PICC_HaltA();
+    mfrc522.PCD_StopCrypto1();
     if (!client.connected()) {
         connectToMQTT();
     }
     client.loop();
-    checkSensors();
-    checkRain();
-    checkFan();
-    char key = readKeypad();
-    if (key != 0 && millis() - lastKeyTime > 200) {
-        lastKeyTime = millis();
-        if (key == '#') {
-            if (inputPassword == correctPassword) {
-                lcd.clear();
-                lcd.setCursor(0, 0);
-                lcd.print("Correct Password");
-                myServo1.write(90);
-                myServo2.write(90);
-                delay(3000);
-                myServo1.write(0);
-                myServo2.write(180);
-                delay(2000);  // Display "Correct Password" for 2 seconds
-                showSmartHome();
-                // Additional actions when the password is correct
-            } else {
-                lcd.clear();
-                lcd.setCursor(0, 0);
-                lcd.print("Wrong Password");
-                delay(2000);  // Display "Wrong Password" for 2 seconds
-                showSmartHome();
-            }
-            inputPassword = "";  // Reset input password
-        } else if (key == '*') {
-            inputPassword = "";  // Clear the current input
-        } else {
-            inputPassword += key;
-            lcd.clear();
-            lcd.setCursor(0, 1);
-            lcd.print(inputPassword);  // Display the current input password on the LCD
-        }
-    }
-
-    if (!mfrc522.PICC_IsNewCardPresent()) {
-        return;
-    }
-    if (!mfrc522.PICC_ReadCardSerial()) {
-        return;
-    }
-    Serial.print("UID tag :");
-    String content = "";
-    for (byte i = 0; i < mfrc522.uid.size; i++) {
-        Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-        Serial.print(mfrc522.uid.uidByte[i], HEX);
-        content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
-        content.concat(String(mfrc522.uid.uidByte[i], HEX));
-    }
-    Serial.println();
-    content.toUpperCase();
-    if (content.substring(1) == "B1 0E 12 1D") {
-        Serial.println("Access Granted");
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Access Granted");
-        myServo3.write(90);
-        delay(3000);
-        myServo3.write(0);
-        showSmartHome();  // Hiển thị "SmartHome" sau khi sử dụng RFID
-        delay(2000);      // Đợi 2 giây
-    } else {
-        Serial.println("Access Denied");
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Access Denied");
-        delay(2000);
-        showSmartHome();  // Hiển thị "SmartHome" sau khi sử dụng RFID
-        delay(2000);      // Đợi 2 giây
-    }
-    mfrc522.PICC_HaltA();
-    mfrc522.PCD_StopCrypto1();
     unsigned long currentMillis = millis();
     static unsigned long previousMillis = 0;
     if (currentMillis - previousMillis >= 2000) {
@@ -373,5 +425,148 @@ void loop() {
         client.publish("SmartHome/humidity", String(h).c_str());
         client.loop();
     }
-    delay(100);
+}
+
+bool updateDoorStatus(bool newStatus) {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        http.begin("http://172.20.10.5:3000/device/664dfd4603ae96243f42b891");
+        http.addHeader("Content-Type", "application/json");
+
+        StaticJsonDocument<512> doc;
+        doc["category"]["name"] = "Door";
+        doc["category"]["topic"] = "Door";
+        doc["category"]["status"] = newStatus;
+        doc["category"]["color"] = "Color(0xffff1900)";
+        doc["category"]["voice"] = "đóng-mở cửa";
+        doc["category"]["notification"] = true;
+        doc["category"]["time"] = "1";
+        doc["category"]["icon"] = "IconData(U+0E3B1)";
+        doc["_id"] = "664dfd4603ae96243f42b891";
+        doc["namecategory"] = "outside";
+        doc["colorcategory"] = "green";
+
+        String json;
+        serializeJson(doc, json);
+
+        int httpResponseCode = http.PUT(json);
+        http.end();
+
+        if (httpResponseCode == 200) {
+            Serial.println("Door");
+            return true;  // Cập nhật thành công
+        } else {
+            Serial.print("Errorserver: ");
+            Serial.println(httpResponseCode);
+            return false;  // Cập nhật không thành công
+        }
+    }/-strong/-heart:>:o:-((:-hSerial.println("WiFi not connected");
+    return false;
+}
+
+bool updateDoorStatuskeypad(bool newStatus) {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        http.begin("http://172.20.10.5:3000/device/6650e07457dacb0993aab456");
+        http.addHeader("Content-Type", "application/json");
+
+        StaticJsonDocument<512> doc;
+        doc["category"]["name"] = "Door";
+        doc["category"]["topic"] = "Door";
+        doc["category"]["status"] = newStatus;
+        doc["category"]["color"] = "Color(0xffff1900)";
+        doc["category"]["voice"] = "đóng-mở cửa";
+        doc["category"]["notification"] = true;
+        doc["category"]["time"] = "1";
+        doc["category"]["icon"] = "IconData(U+0E3B1)";
+        doc["_id"] = "664dfd4603ae96243f42b891";
+        doc["namecategory"] = "outside";
+        doc["colorcategory"] = "green";
+
+        String json;
+        serializeJson(doc, json);
+
+        int httpResponseCode = http.PUT(json);
+        http.end();
+
+        if (httpResponseCode == 200) {
+            Serial.println("Door server");
+            return true;  // Cập nhật thành công
+        } else {
+            Serial.print("Error server: ");
+            Serial.println(httpResponseCode);
+            return false;  // Cập nhật không thành công
+        }
+    }
+    Serial.println("WiFi not connected");
+    return false;
+}
+
+void checkDoorStatus() {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        http.begin("http://172.20.10.5:3000/device/6650e07457dacb0993aab456");
+
+        int httpResponseCode = http.GET();
+        if (httpResponseCode > 0) {
+            String payload = http.getString();
+            Serial.println(httpResponseCode);
+            Serial.println(payload);
+
+            StaticJsonDocument<1024> doc;
+            DeserializationError error = deserializeJson(doc, payload);
+
+            if (error) {
+                Serial.print("deserializeJson() failed: ");
+                Serial.println(error.c_str());
+            } else {
+                bool doorStatus = doc["category"]["status"];  // Lấy trạng thái cửa từ JSON
+                if (doorStatus) {
+                    myServo1.write(90);  // Mở cửa nếu trạng thái là true
+                    myServo2.write(90);  // Mở cửa nếu trạng thái là true
+                    Serial.println("Door is OPEN");
+                } else {
+                    myServo1.write(0);    // Đóng cửa nếu trạng thái là false
+                    myServo2.write(180);  // Đóng cửa nếu trạng thái là false
+                    Serial.println("Door is CLOSED");
+                }
+            }
+        } else {
+            Serial.println("Error on HTTP request");
+        }
+        http.end();
+    }
+}
+
+void checkDoorStatusrfid() {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        http.begin("http://172.20.10.5:3000/device/664dfd4603ae96243f42b891");
+
+        int httpResponseCode = http.GET();
+        if (httpResponseCode > 0) {
+            String payload = http.getString();
+            Serial.println(httpResponseCode);
+            Serial.println(payload);
+
+            StaticJsonDocument<1024> doc;
+            DeserializationError error = deserializeJson(doc, payload);
+
+            if (error) {
+                Serial.print("deserializeJson() failed: ");/-strong/-heart:>:o:-((:-hSerial.println(error.c_str());
+            } else {
+                bool doorStatus = doc["category"]["status"];  // Lấy trạng thái cửa từ JSON
+                if (doorStatus) {
+                    myServo3.write(90);  // Mở cửa nếu trạng thái là true
+                    Serial.println("Door is OPEN");
+                } else {
+                    myServo3.write(0);  // Đóng cửa nếu trạng thái là false
+                    Serial.println("Door is CLOSED");
+                }
+            }
+        } else {
+            Serial.println("Error on HTTP request");
+        }
+        http.end();
+    }
 }
