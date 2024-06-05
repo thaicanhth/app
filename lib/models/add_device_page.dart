@@ -61,7 +61,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
       _formKey.currentState!.save();
 
       final url = widget.device == null
-          ? 'http://192.168.127.1:3000/device'
+          ? 'http://192.168.127.1:3000/devices'
           : 'http://192.168.127.1:3000/device${widget.device!.id}';
 
       final method = widget.device == null ? 'POST' : 'PUT';
@@ -100,7 +100,6 @@ class _AddDevicePageState extends State<AddDevicePage> {
       context: context,
       builder: (BuildContext context) {
         Color pickerColor = Color(0xff443a49);
-
         return AlertDialog(
           title: Text('Pick a color'),
           content: SingleChildScrollView(
@@ -205,6 +204,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
               SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: addOrUpdateDevice,
+
                 child: Text(widget.device == null ? 'Add Device' : 'Update Device'),
               ),
             ],

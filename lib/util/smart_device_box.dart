@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class SmartDeviceBox extends StatelessWidget {
   final String smartDeviceName;
-  final String iconPath;
+  final int iconPath;
   final bool powerOn;
   void Function(bool)? onChanged;
 
@@ -33,12 +33,17 @@ class SmartDeviceBox extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // icon
-              Image.asset(
-                iconPath,
-                height: 65,
-                color: powerOn ? Colors.white : Colors.grey.shade700,
+              // Image.asset(
+              //   iconPath,
+              //   height: 65,
+              //   color: powerOn ? Colors.white : Colors.grey.shade700,
+              // ),
+              Icon(
+                IconData(
+                  fontFamily: 'MaterialIcons',
+                  iconPath
+                ),
               ),
-
               // smart device name + switch
               Row(
                 children: [

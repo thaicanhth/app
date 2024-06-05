@@ -28,7 +28,7 @@ class AuthService {
       );
 
       http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/signup'),
+        Uri.parse('${Constants.uri}/api/register'),
         body: user.toJson(),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -59,7 +59,7 @@ class AuthService {
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       final navigator = Navigator.of(context);
       http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/signin'),
+        Uri.parse('${Constants.uri}/api/login'),
         body: jsonEncode({
           'email': email,
           'password': password,
@@ -102,7 +102,7 @@ class AuthService {
       }
 
       var tokenRes = await http.post(
-        Uri.parse('${Constants.uri}/tokenIsValid'),
+        Uri.parse('${Constants.uri}/profile'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': token!,

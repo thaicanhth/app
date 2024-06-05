@@ -42,7 +42,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Provider.of<UserProvider>(context).user.token.isEmpty ?  const Next_home() :  const HomePage(),
+      home: Provider.of<UserProvider>(context).user.token.isEmpty ?  const HomePage() :  const HomePage(),
       routes: {
         '/addDevice': (context) => AddDevicePage(
           device: ModalRoute.of(context)?.settings.arguments as Device?,

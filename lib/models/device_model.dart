@@ -5,6 +5,7 @@ class Device {
   final String colorcategory;
   final Category category;
 
+
   Device({
     required this.id,
     required this.namecategory,

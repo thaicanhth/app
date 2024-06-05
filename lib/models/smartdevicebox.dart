@@ -9,7 +9,7 @@ class SmartDeviceBox extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  const SmartDeviceBox({
+  const SmartDeviceBox({super.key,
     required this.smartDeviceName,
     required this.iconPath,
     required this.powerOn,
@@ -30,19 +30,7 @@ class SmartDeviceBox extends StatelessWidget {
             value: powerOn,
             onChanged: onChanged,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: onEdit,
-              ),
-              IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: onDelete,
-              ),
-            ],
-          ),
+
         ],
       ),
     );
